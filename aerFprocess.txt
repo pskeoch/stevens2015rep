@@ -1,0 +1,26 @@
+aerF process
+==========================
+
+start loop of 10000:
+	- draw random 2005 direct aerF value in normal distribution (mean = 0.35,sd = 0.125)
+	- get coefficient (pA) translating so2 emissions to direct aerF by 2005aerF/2005so2
+	- draw random pre-industrial aerosol emissions (pN) in normal distribution (mean = 60, sd = 15)
+
+	check pN>=0, discard if it isn't
+
+	start loop through 2005 total aerF range 0.0 to 1.5 at 0.05 increments (31 iterations):
+		- Find 2005 aciF as the difference between 2005 total aerF in this iteration and 2005 direct aerF
+		- calculate log relationship between 2005 so2 and this draw of pre-industrial so2
+		- find so2->aci coefficient (pB) for this iteration from aciF/logrel
+		- draw random nhbias in normal distribution (mean = 1.5, sd = 0.2)
+		
+		calculate aerF for particular year
+		-----------------------------------
+		aerF = (((pA*-1)*self.so2[year])) - (pB*math.log((self.so2[year]/pN)+1))
+		NHaerF = aerF * nhbias
+
+		find 1850 total NH anthro forcing from GHGF + NHaerF
+		find 1950 total NH anthro forcing from GHGF + NHaerF
+		If 1950TotF>1850TotF then add score 1 to this 2005 total aerF, else 0
+
+	For each 0.05 increment in 2005 total aerF find probability as score/no. completed loops (e.g. 10000)
